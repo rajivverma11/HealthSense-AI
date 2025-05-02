@@ -1,0 +1,14 @@
+pandas
+httpx
+crewai
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langchain-experimental
+litellm
+fastapi
+uvicorn
+fastapi
+uvicorn
+sqlite-utils
