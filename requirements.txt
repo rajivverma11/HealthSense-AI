@@ -12,3 +12,6 @@ uvicorn
 fastapi
 uvicorn
 sqlite-utils
+mysql-connector-python
+python-dotenv
+

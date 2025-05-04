@@ -67,6 +67,8 @@ ENV/
 env.bak/
 venv.bak/
 *.env
+.env
+
 
 # SQLite database files
 *.db
