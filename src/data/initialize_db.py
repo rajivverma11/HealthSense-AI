@@ -1,23 +1,16 @@
 import mysql.connector
 from mysql.connector import Error
 
-from src.data.constants import DB_CONFIG
+from src.data.constants import LOCAL_DB_CONFIG
 
 
 def create_tables():
     try:
-        conn = mysql.connector.connect(**DB_CONFIG)
+        conn = mysql.connector.connect(**LOCAL_DB_CONFIG)
         if conn.is_connected():
             cursor = conn.cursor()
  
             # Create tables
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS comparison_lookup (
-                comparison_id TINYINT PRIMARY KEY,
-                label VARCHAR(50)
-            );
-            """)
-
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS hospital_general_information (
                 ProviderID VARCHAR(20) PRIMARY KEY,
@@ -32,13 +25,13 @@ def create_tables():
                 HospitalOwnership VARCHAR(100),
                 EmergencyServices TINYINT(1) DEFAULT 1 ,
                 HospitalRating FLOAT,
-                MortalityNationalComparison TINYINT,
-                SafetyCareNationalComparison TINYINT,
-                ReadmissionNationalComparison TINYINT,
-                PatientExperienceNationalComparison TINYINT,
-                NationalComparisonEffectiveness TINYINT,
-                CareTimelinesNationalComparison TINYINT,
-                EfficientMedicalImagingNationalComparison TINYINT
+                MortalityNationalComparison VARCHAR(100),
+                SafetyCareNationalComparison VARCHAR(100),
+                ReadmissionNationalComparison VARCHAR(100),
+                PatientExperienceNationalComparison VARCHAR(100),
+                NationalComparisonEffectiveness VARCHAR(100),
+                CareTimelinesNationalComparison VARCHAR(100),
+                EfficientMedicalImagingNationalComparison VARCHAR(100)
             );
             """)
 

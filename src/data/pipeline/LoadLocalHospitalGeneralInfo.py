@@ -4,12 +4,17 @@ import mysql.connector
 from mysql.connector import Error
 from src.utils.cleaners import clean_emergency_services_column
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 LOCAL_DB_CONFIG = {
-'host': 'localhost',
-'user':'root',
-'password':'Rajiv8777',
-'database': 'HealthSenseAI',
-'port': 3306
+    'host': os.getenv('LOCAL_DB_HOST'),
+    'user': os.getenv('LOCAL_DB_USER'),
+    'password': os.getenv('LOCAL_DB_PASSWORD'),
+    'database': os.getenv('LOCAL_DB_NAME'),
+    'port': int(os.getenv('LOCAL_DB_PORT'))  # Convert from string to int
 }
 
 def transform_dataframe(df):
@@ -36,33 +41,35 @@ def transform_dataframe(df):
     }
      df.rename(columns=rename_map, inplace=True)
      df = df[list(rename_map.values())]
-     df = clean_emergency_services_column(df)
+     #df = clean_emergency_services_column(df)
+     #print("Columns in df:", df.columns.tolist())
         
 
 
-     comparison_columns = [
-        "MortalityNationalComparison",
-        "SafetyCareNationalComparison",
-        "ReadmissionNationalComparison",
-        "PatientExperienceNationalComparison",
-        "NationalComparisonEffectiveness",
-        "CareTimelinesNationalComparison",
-        "EfficientMedicalImagingNationalComparison"
-    ]
+#      comparison_columns = [
+#         "MortalityNationalComparison",
+#         "SafetyCareNationalComparison",
+#         "ReadmissionNationalComparison",
+#         "PatientExperienceNationalComparison",
+#         "NationalComparisonEffectiveness",
+#         "CareTimelinesNationalComparison",
+#         "EfficientMedicalImagingNationalComparison"
+#     ]
      
-     def map_comparison(val):
-          val1 = str(val).strip().lower()
-          if 'above' in val1:
-               return 3
-          elif 'same' in val1:
-               return 2
-          elif 'below' in val1:
-               return 1
-          else:
-               return 0
+#      def map_comparison(val):
+#           val1 = str(val).strip().lower()
+#           if 'above' in val1:
+#                return 3
+#           elif 'same' in val1:
+#                return 2
+#           elif 'below' in val1:
+#                return 1
+#           else:
+#                return 0
      
-     for col in comparison_columns:
-          df.loc[:, col]  = df[col].apply(map_comparison)
+#      for col in comparison_columns:
+#           df.loc[:, col]  = df[col].apply(map_comparison)
+     
      return df
          
 def insert_data(df):
@@ -90,6 +97,8 @@ def insert_data(df):
         """
           for idx, row in df.iterrows():
             row = row.where(pd.notnull(row), None)
+            #print(row)
+            #print(tuple(row))
             try:
                 cursor.execute(insert_sql, tuple(row))
             except Error as e:
@@ -110,9 +119,11 @@ if __name__ == "__main__":
      print("Running initialize_db.py...")
      file_path = 'data/Hospital_General_Information.csv'
      df = pd.read_csv(file_path)
+     #df = df.head(3)
      #print("Columns in CSV:", df.columns.tolist())
 
      df_clean = transform_dataframe(df)
+     #print("Columns in df_clean:",df_clean.columns.tolist())
      insert_data(df_clean)
 
      

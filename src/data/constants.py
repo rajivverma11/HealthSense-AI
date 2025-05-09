@@ -11,3 +11,11 @@ DB_CONFIG = {
     'database': os.getenv('DB_NAME'),
     'port': int(os.getenv('DB_PORT', 3306))
 }
+
+LOCAL_DB_CONFIG = {
+    'host': os.getenv('LOCAL_DB_HOST'),
+    'user': os.getenv('LOCAL_DB_USER'),
+    'password': os.getenv('LOCAL_DB_PASSWORD'),
+    'database': os.getenv('LOCAL_DB_NAME'),
+    'port': int(os.getenv('LOCAL_DB_PORT', 3306))
+}
