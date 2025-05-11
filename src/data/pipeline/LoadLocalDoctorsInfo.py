@@ -1,62 +1,77 @@
-import sqlite3
+import pandas as pd
+import numpy as np
+import mysql.connector
+from mysql.connector import Error
+from src.utils.cleaners import clean_yes_no_column_into_zero_one
 
-# Connect to SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect("appointments.db")
-cursor = conn.cursor()
 
-# Create patients table
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS patients (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    age INTEGER,
-    gender TEXT
-)
-""")
+from dotenv import load_dotenv
+import os
 
-# Create appointments table
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS appointments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    patient_id INTEGER,
-    appointment_date TEXT,
-    doctor TEXT,
-    reason TEXT,
-    FOREIGN KEY(patient_id) REFERENCES patients(id)
-)
-""")
+load_dotenv()
 
-# Insert sample data into patients
-cursor.execute("INSERT INTO patients (name, age, gender) VALUES (?, ?, ?)", ("John Doe", 30, "Male"))
-cursor.execute("INSERT INTO patients (name, age, gender) VALUES (?, ?, ?)", ("Jane Smith", 25, "Female"))
+LOCAL_DB_CONFIG = {
+    'host': os.getenv('LOCAL_DB_HOST'),
+    'user': os.getenv('LOCAL_DB_USER'),
+    'password': os.getenv('LOCAL_DB_PASSWORD'),
+    'database': os.getenv('LOCAL_DB_NAME'),
+    'port': int(os.getenv('LOCAL_DB_PORT'))  # Convert from string to int
+}
 
-# Get inserted patient IDs
-cursor.execute("SELECT id FROM patients WHERE name='John Doe'")
-john_id = cursor.fetchone()[0]
 
-cursor.execute("SELECT id FROM patients WHERE name='Jane Smith'")
-jane_id = cursor.fetchone()[0]
+def transform_dataframe(df):
+     rename_map = {
+        "name": "Name",
+        "specialization": "Specialization",
+        "contact": "Contact"
+    }
+     df.rename(columns=rename_map, inplace=True)
+     df = df[list(rename_map.values())]
+     
+     
+     return df
+         
+def insert_data(df):
+    # Replace NaNs with None for MySQL compatibility
+    # Convert string 'nan', 'NaN', etc. to actual None
+    df = df.replace(to_replace=['nan', 'NaN', 'NAN', 'None', 'NONE'], value=None)
 
-# Insert sample data into appointments
-cursor.execute("INSERT INTO appointments (patient_id, appointment_date, doctor, reason) VALUES (?, ?, ?, ?)",
-               (john_id, "2025-05-05", "Dr. House", "Flu symptoms"))
+    # Ensure Pandas NaNs (np.nan) are also converted to None
+    df = df.where(pd.notnull(df), None)
 
-cursor.execute("INSERT INTO appointments (patient_id, appointment_date, doctor, reason) VALUES (?, ?, ?, ?)",
-               (jane_id, "2025-05-06", "Dr. Grey", "Annual checkup"))
 
-# Commit changes
-conn.commit()
+    try:
+          conn = mysql.connector.connect(**LOCAL_DB_CONFIG)
+          cursor = conn.cursor()
+          cursor.execute("DELETE FROM doctors_info_data") 
+          insert_sql = """
+        INSERT INTO doctors_info_data (
+            Name, Specialization, Contact
+        ) VALUES (%s, %s, %s)
+        """
+          for idx, row in df.iterrows():
+            #row = row.where(pd.notnull(row), None)
+            try:
+                cursor.execute(insert_sql, tuple(row))
+            except Error as e:
+                print(f"Failed to insert row {idx} with id={row.get('id')}: {e}")
 
-# Print the data to confirm
-print("Patients:")
-cursor.execute("SELECT * FROM patients")
-for row in cursor.fetchall():
-    print(row)
+          conn.commit()
+          print("Data inserted successfully.")
 
-print("\nAppointments:")
-cursor.execute("SELECT * FROM appointments")
-for row in cursor.fetchall():
-    print(row)
+    except Error as e:
+          print(f"Error: {e}")
+    finally:
+          if conn.is_connected():
+               cursor.close()
+               conn.close()
+         
 
-# Close connection
-conn.close()
+if __name__ == "__main__":
+     print("Running initialize_db.py...")
+     file_path = 'data/doctors_info_data.csv'
+     df = pd.read_csv(file_path)
+     #print("Columns in CSV:", df.columns.tolist())
+
+     df_clean = transform_dataframe(df)
+     insert_data(df_clean)

@@ -17,7 +17,7 @@ def create_tables():
                 HospitalName VARCHAR(255),
                 Address VARCHAR(1000),
                 City VARCHAR(100),
-                state VARCHAR(100),
+                State VARCHAR(100),
                 ZipCode VARCHAR(20),
                 CountyName VARCHAR(100),
                 PhoneNumber VARCHAR(20),
@@ -46,29 +46,46 @@ def create_tables():
 
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS doctors_info_data (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(200),
-                specialization VARCHAR(200),
-                contact VARCHAR(100)
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Name VARCHAR(200),
+                Specialization VARCHAR(200),
+                Contact VARCHAR(100)
             );
             """)
 
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS doctors_slots_data (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                doctor_id VARCHAR(200),
-                datetime DATETIME NOT NULL,
-                is_available TINYINT(1) DEFAULT 1 
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Doctor_id VARCHAR(200),
+                Datetime DATETIME NOT NULL,
+                Is_available TINYINT(1) DEFAULT 1 
             );
             """)
 
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS hospitals_emergency_data (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                zipCode VARCHAR(20),
-                hospitalName VARCHAR(200),
-                ambulanceAvailable TINYINT(1) DEFAULT 1 
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                ZipCode VARCHAR(20),
+                HospitalName VARCHAR(200),
+                AmbulanceAvailable TINYINT(1) DEFAULT 1 
             );
+            """)
+
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS patient_info (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Name VARCHAR(100),
+                Dateofbirth DATETIME,
+                Gender VARCHAR(10),
+                Address VARCHAR(200),
+                State VARCHAR(100),
+                Zipcode VARCHAR(20),
+                Ethnicity VARCHAR(100),
+                Firstdisease VARCHAR(100),
+                Seconddisease VARCHAR(100)
+               
+            );
+              
             """)
 
             

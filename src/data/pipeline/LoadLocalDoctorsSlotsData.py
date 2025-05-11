@@ -21,13 +21,21 @@ LOCAL_DB_CONFIG = {
 
 def transform_dataframe(df):
      rename_map = {
-        "Zip Code": "ZipCode",
-        "Hospital Name": "HospitalName",
-        "Ambulance Available": "AmbulanceAvailable"
+        "doctor_id": "Doctor_id",
+        "datetime": "Datetime",
+        "is_available": "Is_available"
+        
     }
+     
+
+    # Step 1: Convert 'Datetime' column to datetime object from 12-hour format
+     df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d %I:%M %p', errors='coerce')
+
+    # Step 2: Convert to string in MySQL-compatible 24-hour format
+     df['datetime'] = df['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
      df.rename(columns=rename_map, inplace=True)
      df = df[list(rename_map.values())]
-     df = clean_yes_no_column_into_zero_one(df,"AmbulanceAvailable","AmbulanceAvailable")
      
      return df
          
@@ -43,10 +51,10 @@ def insert_data(df):
     try:
           conn = mysql.connector.connect(**LOCAL_DB_CONFIG)
           cursor = conn.cursor()
-          cursor.execute("DELETE FROM hospitals_emergency_data") 
+          cursor.execute("DELETE FROM doctors_slots_data") 
           insert_sql = """
-        INSERT INTO hospitals_emergency_data (
-            ZipCode, HospitalName, AmbulanceAvailable
+        INSERT INTO doctors_slots_data (
+            Doctor_id, Datetime, Is_available
         ) VALUES (%s, %s, %s)
         """
           for idx, row in df.iterrows():
@@ -69,7 +77,7 @@ def insert_data(df):
 
 if __name__ == "__main__":
      print("Running initialize_db.py...")
-     file_path = 'data/hospitals_emergency_data.csv'
+     file_path = 'data/doctors_slots_data.csv'
      df = pd.read_csv(file_path)
      #print("Columns in CSV:", df.columns.tolist())
 

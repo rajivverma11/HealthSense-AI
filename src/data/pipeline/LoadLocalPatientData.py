@@ -21,13 +21,19 @@ LOCAL_DB_CONFIG = {
 
 def transform_dataframe(df):
      rename_map = {
-        "Zip Code": "ZipCode",
-        "Hospital Name": "HospitalName",
-        "Ambulance Available": "AmbulanceAvailable"
+        "Name": "Name",
+        "Gender": "Gender",
+        "Dateofbirth": "DateOfBirth",
+        "Ethnicity": "Ethnicity",
+        "FirstDisease": "FirstDisease",
+        "SecondDisease": "SecondDisease",
+        "Address": "Address",
+        "State": "State",
+        "ZipCode": "ZipCode"
     }
+
      df.rename(columns=rename_map, inplace=True)
      df = df[list(rename_map.values())]
-     df = clean_yes_no_column_into_zero_one(df,"AmbulanceAvailable","AmbulanceAvailable")
      
      return df
          
@@ -43,11 +49,11 @@ def insert_data(df):
     try:
           conn = mysql.connector.connect(**LOCAL_DB_CONFIG)
           cursor = conn.cursor()
-          cursor.execute("DELETE FROM hospitals_emergency_data") 
+          cursor.execute("DELETE FROM patient_info") 
           insert_sql = """
-        INSERT INTO hospitals_emergency_data (
-            ZipCode, HospitalName, AmbulanceAvailable
-        ) VALUES (%s, %s, %s)
+        INSERT INTO patient_info (
+            Name, Gender, DateOfBirth, Ethnicity, FirstDisease, SecondDisease, Address, State, ZipCode
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s)
         """
           for idx, row in df.iterrows():
             #row = row.where(pd.notnull(row), None)
@@ -69,9 +75,9 @@ def insert_data(df):
 
 if __name__ == "__main__":
      print("Running initialize_db.py...")
-     file_path = 'data/hospitals_emergency_data.csv'
+     file_path = 'data/Synthetic_Patient_Data.csv'
      df = pd.read_csv(file_path)
-     #print("Columns in CSV:", df.columns.tolist())
+     print("Columns in CSV:", df.columns.tolist())
 
      df_clean = transform_dataframe(df)
      insert_data(df_clean)
