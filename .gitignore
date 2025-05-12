@@ -88,3 +88,4 @@ secrets.json
 *.pkl
 *.joblib
 *.h5
+.DS_Store

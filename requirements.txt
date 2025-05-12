@@ -1,5 +1,6 @@
 pandas
 httpx
+langchain
 crewai
 langchain
 langchain-core
@@ -13,5 +14,4 @@ fastapi
 uvicorn
 sqlite-utils
 mysql-connector-python
-python-dotenv
-
+python-dotenv    

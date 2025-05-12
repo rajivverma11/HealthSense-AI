@@ -1,0 +1,214 @@
+.
+├── .DS_Store
+├── .env
+├── .git
+│   ├── COMMIT_EDITMSG
+│   ├── config
+│   ├── description
+│   ├── FETCH_HEAD
+│   ├── HEAD
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── heads
+│   │       │   └── main
+│   │       └── remotes
+│   │           └── origin
+│   │               └── main
+│   ├── objects
+│   │   ├── 01
+│   │   │   └── a32801e8f38edb20c9bd92623d5d581044911e
+│   │   ├── 05
+│   │   │   └── 5e3ca780064698255210b69c2311dc30645c5d
+│   │   ├── 0a
+│   │   │   └── 5568b3eb72786b7d025f317905c26d9b2a59ce
+│   │   ├── 0c
+│   │   │   └── 325a87479fa4d5de27f0090543e00aa5f88af2
+│   │   ├── 0d
+│   │   │   └── 90fa1cc7dac232ed9736f2d7ec19c97e9dc51d
+│   │   ├── 0f
+│   │   │   └── 3c0e9dfa5d9360208f55400bb90f3ba5e042f9
+│   │   ├── 19
+│   │   │   └── e25aa7b596bac325bea77d9535622eee47e8a3
+│   │   ├── 1d
+│   │   │   └── 908e4ff5afb681a90554fd60411b6b4616f1a3
+│   │   ├── 25
+│   │   │   └── 423717298c3df7632aa736f479cd4454101023
+│   │   ├── 28
+│   │   │   └── 667e88f3f4b3866527b7a457e3f8459cef6277
+│   │   ├── 29
+│   │   │   └── 2e39bfa9d113b2d231826d732b592a752cb57d
+│   │   ├── 2c
+│   │   │   └── 1d28c1309100e668027d280b9548ae18f6dc01
+│   │   ├── 2e
+│   │   │   └── c65d3d70d972650c3a92e49ec866400141ba37
+│   │   ├── 2f
+│   │   │   └── e907929275240ba83e1b5f4f36d7cc55569f70
+│   │   ├── 33
+│   │   │   └── efa6e1f243b3c7cc8110c608a174cd83e6b28f
+│   │   ├── 39
+│   │   │   └── 53e204a4185e91b5dc5f47648e064f1e1bf338
+│   │   ├── 3b
+│   │   │   ├── 20675586d53e5f0abbff3cb1e8f2bfbe74e4fc
+│   │   │   └── a5121e4d5f3bba18bd6f78b0ca3c7248937ec0
+│   │   ├── 48
+│   │   │   └── 5b1390021c9a7b46e0cfa76660a7715ea3df86
+│   │   ├── 4a
+│   │   │   └── 6a6de65e54ccd60f7fbd917f93c677afd611e2
+│   │   ├── 57
+│   │   │   └── 7a65ff94a0c5a06a80a12b976982be02c3eba1
+│   │   ├── 60
+│   │   │   └── 371aaa7372aa399379538eca55bd94c9e7086a
+│   │   ├── 66
+│   │   │   └── 37b86d6f61cf4979d4672fc76238ded624d846
+│   │   ├── 74
+│   │   │   └── e1a302bbf1ba06354336ca0d3c8caf9e8990a7
+│   │   ├── 77
+│   │   │   └── 13071780ebb659a19835d2eb3e4699a7ca95a6
+│   │   ├── 7d
+│   │   │   └── 2b258d1bcbbed372bd64be24e59592d9e432fd
+│   │   ├── 80
+│   │   │   └── db151f91255fcbd8ec9d5afdb3b641d868af33
+│   │   ├── 81
+│   │   │   └── 1db94f06936727422b211e4e63147cc1d5485a
+│   │   ├── 82
+│   │   │   └── 076ec7328d124eb8d35ab0130850bc0b9d5d71
+│   │   ├── 83
+│   │   │   ├── 13d09ffb4124542da47ddc7b54e65b93382fbf
+│   │   │   └── bfd9f20a3fb4559ad6f885512e544db0a73017
+│   │   ├── 84
+│   │   │   └── 2a9674ec1d11f78b6fb0e639564f29a9efbbc0
+│   │   ├── 85
+│   │   │   └── aa4dcbbd0e1c2ff2cae0d822fe4b923992ecdd
+│   │   ├── 86
+│   │   │   └── 7078bce12f7fecfde16ed6e71027b0fd1ddb9a
+│   │   ├── 94
+│   │   │   └── 0be581b0eaf3c32cd17080d4c916404c298064
+│   │   ├── 9b
+│   │   │   └── 9b8ab0e283ae2c6b231e32248f708643077612
+│   │   ├── 9e
+│   │   │   └── 41bad196196dee1d00e2310b6d8d9ae68ad9ec
+│   │   ├── b0
+│   │   │   └── eb7eda6d40473946ffb33c45c9b2b6a7322801
+│   │   ├── b3
+│   │   │   └── 0ffff0f0987d67656d55821d126ee53e6b84ee
+│   │   ├── b9
+│   │   │   └── a4fa28dae15f12e929106a8316bdd2b2b474b8
+│   │   ├── be
+│   │   │   └── f533560fdb6e09843cc84e6c1caed2dfeed745
+│   │   ├── bf
+│   │   │   └── 0f587e4291740cfcf4a881519388b2f39a713b
+│   │   ├── c4
+│   │   │   ├── 19795d92fc2805b75fb521b04d6d4357113a5f
+│   │   │   └── 1f9f9fba45596b0e0331bab2c5cb4fc8f43b80
+│   │   ├── cd
+│   │   │   ├── 28d832bd67f3653650ad643160b0a629ef189e
+│   │   │   └── 7042353a1c8e7a682f3a76e990522a11975548
+│   │   ├── da
+│   │   │   └── 9a54bbe205d646683f9bbfe687e6cb414dcb8b
+│   │   ├── e6
+│   │   │   └── 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+│   │   ├── f3
+│   │   │   └── 005b2c65cc9197feaf2ae8fd0533d1923488b3
+│   │   ├── f6
+│   │   │   └── e5a0e0133e6bbc2e0d77a9dd2ceb41a4604b98
+│   │   ├── f7
+│   │   │   └── 5b1fafde5f8aaf31699b0afd1cf7ddc68310e0
+│   │   ├── fc
+│   │   │   └── 1ff72285ded8f25c4cbf4be1d75734a02989fd
+│   │   ├── info
+│   │   └── pack
+│   └── refs
+│       ├── heads
+│       │   └── main
+│       ├── remotes
+│       │   └── origin
+│       │       └── main
+│       └── tags
+├── .gitattributes
+├── .gitignore
+├── .vscode
+│   └── settings.json
+├── appointments.db
+├── data
+│   ├── doctors_info_data.csv
+│   ├── doctors_slots_data.csv
+│   ├── DoctoSlotSimulation.json
+│   ├── Hospital_General_Information.csv
+│   ├── Hospital_Information_with_Lab_Tests.csv
+│   ├── hospitals_emergency_data.csv
+│   └── Synthetic_Patient_Data.csv
+├── Dockerfile
+├── folder_structure.txt
+├── README.md
+├── requirements.txt
+└── src
+    ├── __init__.py
+    ├── __pycache__
+    │   └── __init__.cpython-311.pyc
+    ├── data
+    │   ├── __init__.py
+    │   ├── __pycache__
+    │   │   ├── __init__.cpython-311.pyc
+    │   │   ├── constants.cpython-311.pyc
+    │   │   ├── doctor_slot_generator.cpython-311.pyc
+    │   │   ├── initialize_db.cpython-311.pyc
+    │   │   ├── LoadLocalHospitalGeneralInfo.cpython-311.pyc
+    │   │   └── main.cpython-311.pyc
+    │   ├── app.py
+    │   ├── appointments.db
+    │   ├── constants.py
+    │   ├── DiagnosticInfoAgent.py
+    │   ├── doctor_slot_generator.py
+    │   ├── DoctorInfoAgent.py
+    │   ├── emergency.db
+    │   ├── EmergencyServicesAgent.py
+    │   ├── HospitalComparisonAgent.py
+    │   ├── initialize_db.py
+    │   ├── main.py
+    │   └── pipeline
+    │       ├── __pycache__
+    │       │   ├── LoadLocalDoctorsInfo.cpython-311.pyc
+    │       │   ├── LoadLocalDoctorsSlotsData.cpython-311.pyc
+    │       │   ├── LoadLocalHospitalEmergency.cpython-311.pyc
+    │       │   ├── LoadLocalHospitalGeneralInfo.cpython-311.pyc
+    │       │   ├── LoadLocalHospitalInfoWithLabTest.cpython-311.pyc
+    │       │   └── LoadLocalPatientData.cpython-311.pyc
+    │       ├── Aws_LoadDoctorsInfo.py
+    │       ├── Aws_LoadDoctorsSlotsData.py
+    │       ├── Aws_LoadHospitalEmergency.py
+    │       ├── Aws_LoadHospitalGeneralInfo.py
+    │       ├── Aws_LoadHospitalInfoWithLabTest.py
+    │       ├── Aws_LoadLocalPatientData.py
+    │       ├── Aws_LoadPatientData.py
+    │       ├── LoadLocalDoctorsInfo.py
+    │       ├── LoadLocalDoctorsSlotsData.py
+    │       ├── LoadLocalHospitalEmergency.py
+    │       ├── LoadLocalHospitalGeneralInfo.py
+    │       ├── LoadLocalHospitalInfoWithLabTest.py
+    │       └── LoadLocalPatientData.py
+    ├── static
+    │   └── index.html
+    └── utils
+        ├── __pycache__
+        │   └── cleaners.cpython-311.pyc
+        └── cleaners.py
+
+76 directories, 136 files
