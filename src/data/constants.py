@@ -17,5 +17,8 @@ LOCAL_DB_CONFIG = {
     'user': os.getenv('LOCAL_DB_USER'),
     'password': os.getenv('LOCAL_DB_PASSWORD'),
     'database': os.getenv('LOCAL_DB_NAME'),
-    'port': int(os.getenv('LOCAL_DB_PORT', 3306))
+    'port': int(os.getenv('LOCAL_DB_PORT', 3306)),
+    'OPENAI_API_KEY': os.getenv('OPENAI_API_KEY'),
+    'LLM_MODEL_NAME': os.getenv('LLM_MODEL_NAME')
+
 }

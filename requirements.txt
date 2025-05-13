@@ -15,3 +15,5 @@ uvicorn
 sqlite-utils
 mysql-connector-python
 python-dotenv    
+pymysql
+sqlalchemy

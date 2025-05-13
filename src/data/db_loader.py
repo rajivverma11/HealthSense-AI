@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 from src.data.constants import LOCAL_DB_CONFIG
-import mysql.connector
+
 
 
 
