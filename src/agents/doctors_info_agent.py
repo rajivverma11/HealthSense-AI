@@ -1,5 +1,4 @@
-import os
-from dotenv import load_dotenv
+from src.data.db_loader import get_mysql_uri
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
@@ -24,7 +23,7 @@ class DoctorsInfoAgent:
             raise ValueError("❌ OPENAI_API_KEY not found in environment!")
 
         # ✅ Load MySQL connection details
-        mysql_uri = self._get_mysql_uri()
+        mysql_uri = get_mysql_uri()
 
         # ✅ Connect to MySQL database
         self.db = SQLDatabase.from_uri(mysql_uri)
@@ -56,18 +55,7 @@ class DoctorsInfoAgent:
         # ✅ Finalize Executor
         self.executor = AgentExecutor(agent=agent, tools=self.tools, verbose=True)
 
-    def _get_mysql_uri(self) -> str:
-        """Builds SQLAlchemy-style MySQL URI from .env"""
-        user = LOCAL_DB_CONFIG['user']
-        password = LOCAL_DB_CONFIG['password']
-        host = LOCAL_DB_CONFIG['host']
-        port = LOCAL_DB_CONFIG['port']
-        db = LOCAL_DB_CONFIG['database']
 
-        if not all([user, password, host, port, db]):
-            raise ValueError("❌ Missing one or more MySQL DB environment variables.")
-
-        return f"mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
 
     def run(self, user_input: str) -> str:
         """Runs the AI agent against a user query."""

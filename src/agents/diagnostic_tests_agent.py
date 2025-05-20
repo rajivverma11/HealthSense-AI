@@ -1,18 +1,23 @@
+# diagnostic_info_agent.py
+
 import pandas as pd
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
-from langchain_openai import ChatOpenAI
-from langchain.agents.agent_types import AgentType
-from langchain_core.prompts import SystemMessagePromptTemplate, ChatPromptTemplate
-from src.data.constants import LOCAL_DB_CONFIG
+from langchain.agents import AgentType  # keep this import for the agent type
+
+#from langchain.agents import create_pandas_dataframe_agent, AgentType
+from langchain.prompts.chat import SystemMessagePromptTemplate, ChatPromptTemplate
+from langchain.tools import BaseTool
 
 
+class DiagnosticInfoAgent:
+    def __init__(self, llm, data_path: str = "data/Hospital_Information_with_Lab_Tests.csv", verbose=True):
+        self.llm = llm
+        self.verbose = verbose
+        self.data_path = data_path
 
-class HospitalComparisonAgent:
-    def __init__(self, df: pd.DataFrame):
-        # System-level prompt
-        system_message = SystemMessagePromptTemplate.from_template(
+        self.system_message = SystemMessagePromptTemplate.from_template(
             """
-            You are a highly skilled healthcare assistant with expertise in comparing hospitals.
+            You are a highly skilled healthcare assistant with expertise in suggesting health screening tests and packages.
             Your task is to assess various hospitals based on a user's specific conditions, preferences, and needs.
             You will evaluate hospitals considering factors such as medical specialties, patient reviews, location, cost, accessibility, facilities,
             and the availability of treatment for specific conditions.
@@ -29,27 +34,36 @@ class HospitalComparisonAgent:
             - Personalized Recommendation: Provide a clear, personalized suggestion based on the user’s priorities, whether they are medical
             expertise, convenience, or cost.
 
-            Use "HospitalType" column to look for good facilities of each hospital.
             CAREFULLY look at each column name to understand what to output.
             """
         )
 
-        prompt = ChatPromptTemplate.from_messages([system_message])
+        df = pd.read_csv(self.data_path)
+        prompt = ChatPromptTemplate.from_messages([self.system_message])
 
-        # Load OpenAI LLM
-        openai_api_key = LOCAL_DB_CONFIG["OPENAI_API_KEY"]
-        llm = ChatOpenAI(model=LOCAL_DB_CONFIG['LLM_MODEL_NAME'], api_key=openai_api_key)
-
-        # Create the agent
         self.agent = create_pandas_dataframe_agent(
-            llm=llm,
+            llm=self.llm,
             df=df,
             prompt=prompt,
-            verbose=True,
+            verbose=self.verbose,
             allow_dangerous_code=True,
-            agent_type=AgentType.OPENAI_FUNCTIONS
+            agent_type=AgentType.OPENAI_FUNCTIONS,
         )
 
-    def compare(self, query: str) -> str:
-        """Run the user query through the agent."""
-        return self.agent.run(query)
+    def run_query(self, query: str) -> str:
+        return self.agent.invoke(query)
+
+
+class DiagnosticTool(BaseTool):
+    name: str = "pandas_tool"
+    description: str = "Query pandas dataframe and analyze diagnostic test/package data"
+
+    def __init__(self, agent_instance: DiagnosticInfoAgent):
+        super().__init__()
+        self.agent = agent_instance
+
+    def _run(self, query: str) -> str:
+        return self.agent.run_query(query)
+
+    def _arun(self, query: str) -> str:
+        raise NotImplementedError("Async not supported")
