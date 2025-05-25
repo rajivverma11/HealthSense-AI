@@ -1,63 +1,85 @@
-from src.data.db_loader import get_mysql_uri
-from langchain_openai import ChatOpenAI
-from langchain.agents import AgentExecutor, create_openai_tools_agent
-from langchain_community.agent_toolkits import SQLDatabaseToolkit
+# src/agents/doctor_slot_agent.py
+
+import httpx
+import litellm
+from langchain.prompts import PromptTemplate
+from langchain.agents import create_sql_agent
 from langchain_community.utilities import SQLDatabase
-from langchain_core.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-)
-import mysql.connector
-from langchain_core.messages import AIMessage
-from langchain_community.agent_toolkits.sql.prompt import SQL_FUNCTIONS_SUFFIX
-from src.data.constants import LOCAL_DB_CONFIG
+from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+from langchain_openai import ChatOpenAI
+from crewai import Agent
+from crewai.tools import BaseTool
+from pydantic import Field
+from typing import Any
+from src.data.db_loader import get_mysql_uri
 
-class DoctorsInfoAgent:
-    def __init__(self, llm_model: str = LOCAL_DB_CONFIG['LLM_MODEL_NAME']):
-        
 
-        # ✅ Load OpenAI API Key
-        api_key = LOCAL_DB_CONFIG['OPENAI_API_KEY']
-        if not api_key:
-            raise ValueError("❌ OPENAI_API_KEY not found in environment!")
+# Disable SSL warning for LiteLLM (optional, not recommended in production)
+litellm.client_session = httpx.Client(verify=False)
 
-        # ✅ Load MySQL connection details
-        mysql_uri = get_mysql_uri()
+class DoctorSlotAgent:
+    def __init__(self, llm=None, db_path=get_mysql_uri(), verbose=True):
+        self.llm = llm or ChatOpenAI(model="gpt-4", temperature=0)
+        self.verbose = verbose
+        self.db = SQLDatabase.from_uri(db_path)
 
-        # ✅ Connect to MySQL database
-        self.db = SQLDatabase.from_uri(mysql_uri)
+        self.prompt_template = PromptTemplate.from_template(
+            '''Answer the following questions as best you can. You have access to the following tools:
 
-        # ✅ Initialize LLM
-        self.llm = ChatOpenAI(model=llm_model, api_key=api_key)
+{tools}
 
-        # ✅ Build SQL Agent Toolkit
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Use like operator with lowercase when matching a name.
+When a user is asking to book slots for any dr, update is_available the corresponding row from the table.
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}'''
+        )
+
         self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
-        self.context = self.toolkit.get_context()
-        self.tools = self.toolkit.get_tools()
+        self.langchain_agent = create_sql_agent(
+            llm=self.llm,
+            toolkit=self.toolkit,
+            prompt=self.prompt_template,
+            verbose=self.verbose,
+            handle_parsing_errors=True
+        )
 
-        # ✅ Define Prompt
-        messages = [
-            HumanMessagePromptTemplate.from_template("{input}"),
-            AIMessage(content=SQL_FUNCTIONS_SUFFIX + """
-                Use the LIKE operator with lowercase when matching doctor names.
-                When a user books a slot, set is_slot_available = 0 (do not delete the row).
-                If the user cancels the slot, set is_slot_available = 1 to restore availability.
-            """),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
-        ]
-
-        prompt = ChatPromptTemplate.from_messages(messages).partial(**self.context)
-
-        # ✅ Create AI Agent
-        agent = create_openai_tools_agent(llm=self.llm, tools=self.tools, prompt=prompt)
-
-        # ✅ Finalize Executor
-        self.executor = AgentExecutor(agent=agent, tools=self.tools, verbose=True)
+    def run_query(self, query: str) -> str:
+        return self.langchain_agent.invoke(query)
 
 
+class SlotsQueryTool(BaseTool):
+    name: str = "sql_query_tool"
+    description: str = "Run SQL queries and analyze database data"
+    agent: Any = Field(...)
 
-    def run(self, user_input: str) -> str:
-        """Runs the AI agent against a user query."""
-        result = self.executor.invoke({"input": user_input})
-        return result["output"]
+    def _run(self, query: str) -> str:
+        return self.agent.run_query(query)
+
+    def _arun(self, query: str) -> str:
+        raise NotImplementedError("Async not supported")
+
+
+def build_crewai_agent(llm=None) -> Agent:
+    agent_impl = DoctorSlotAgent(llm=llm)
+    tool = SlotsQueryTool(agent=agent_impl)
+
+    return Agent(
+        role="Doctor Availability Checker and Slot Booking",
+        goal="Analyze doctor availability and book slots if asked",
+        backstory="Expert at querying and modifying SQL slot data for doctors.",
+        tools=[tool],
+        verbose=True
+    )

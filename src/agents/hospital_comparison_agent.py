@@ -4,6 +4,10 @@ from langchain_openai import ChatOpenAI
 from langchain.agents.agent_types import AgentType
 from langchain_core.prompts import SystemMessagePromptTemplate, ChatPromptTemplate
 from src.data.constants import LOCAL_DB_CONFIG
+from crewai import Agent, Task, Crew, Process
+from crewai.tools import BaseTool
+from typing import Any
+from pydantic import Field
 
 
 
@@ -53,3 +57,27 @@ class HospitalComparisonAgent:
     def compare(self, query: str) -> str:
         """Run the user query through the agent."""
         return self.agent.run(query)
+
+class PandasTool(BaseTool):
+    name: str = "pandas_tool"
+    description: str = "Query pandas dataframe and analyze data"
+    
+    agent_instance: Any = Field(...)
+
+    def __init__(self, agent_instance: Any):
+        super().__init__(agent_instance=agent_instance)
+
+    def _run(self, query: str) -> str:
+        return self.agent_instance.compare(query)
+
+    def _arun(self, query: str) -> str:
+        raise NotImplementedError("Async not supported")
+
+
+# hospital_info_agent = Agent(
+#     role='Hospital Information Analyst',
+#     goal='Analyze hospital data using pandas dataframe and provide relevant output',
+#     backstory='Expert at analyzing complex datasets using pandas dataframe',
+#     tools=[PandasTool()],
+#     verbose=True
+# )
