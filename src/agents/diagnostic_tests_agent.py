@@ -7,13 +7,14 @@ from langchain.agents import AgentType  # keep this import for the agent type
 #from langchain.agents import create_pandas_dataframe_agent, AgentType
 from langchain.prompts.chat import SystemMessagePromptTemplate, ChatPromptTemplate
 from langchain.tools import BaseTool
+from src.data.db_loader import load_hospital_info_test_dataframe
 
 
 class DiagnosticInfoAgent:
-    def __init__(self, llm, data_path: str = "data/Hospital_Information_with_Lab_Tests.csv", verbose=True):
+    def __init__(self, llm, verbose=True):
         self.llm = llm
         self.verbose = verbose
-        self.data_path = data_path
+        
 
         self.system_message = SystemMessagePromptTemplate.from_template(
             """
@@ -38,7 +39,9 @@ class DiagnosticInfoAgent:
             """
         )
 
-        df = pd.read_csv(self.data_path)
+        df = load_hospital_info_test_dataframe()
+        print(f"number of rows: {df.shape[0]}")
+        #print(df.count())
         prompt = ChatPromptTemplate.from_messages([self.system_message])
 
         self.agent = create_pandas_dataframe_agent(
