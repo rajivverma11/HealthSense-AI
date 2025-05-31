@@ -17,3 +17,4 @@ mysql-connector-python
 python-dotenv    
 pymysql
 sqlalchemy
+crewai-tools

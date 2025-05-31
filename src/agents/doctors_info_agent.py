@@ -3,7 +3,7 @@
 import httpx
 import litellm
 from langchain.prompts import PromptTemplate
-from langchain.agents import create_sql_agent
+from langchain_community.agent_toolkits.sql.base import create_sql_agent  
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_openai import ChatOpenAI
@@ -53,7 +53,8 @@ Thought:{agent_scratchpad}'''
             toolkit=self.toolkit,
             prompt=self.prompt_template,
             verbose=self.verbose,
-            handle_parsing_errors=True
+            handle_parsing_errors=True,
+            max_iterations=2
         )
 
     def run_query(self, query: str) -> str:
@@ -81,5 +82,5 @@ def build_crewai_agent(llm=None) -> Agent:
         goal="Analyze doctor availability and book slots if asked",
         backstory="Expert at querying and modifying SQL slot data for doctors.",
         tools=[tool],
-        verbose=True
+        verbose=False
     )

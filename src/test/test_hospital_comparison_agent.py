@@ -1,5 +1,3 @@
-# src/test/test_hospital_comparison_agent.py
-
 from langchain_openai import ChatOpenAI
 from src.agents.hospital_comparison_agent import HospitalComparisonAgent
 
