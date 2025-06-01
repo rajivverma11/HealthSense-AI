@@ -1,199 +1,70 @@
-
-import pandas as pd
+from textwrap import dedent
 from crewai import Agent
+from crewai.tools import BaseTool
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 from langchain_openai import ChatOpenAI
-from langchain.tools.base import BaseTool
-from typing import Optional, Type
+from src.data.db_loader import load_hospital_dataframe
+from typing import Type
 from pydantic import BaseModel
 
-from src.data.db_loader import load_hospital_dataframe
 
-
-# ✅ Custom tool for CrewAI that is a proper subclass of BaseTool
-class HospitalComparisonInput(BaseModel):
+# ✅ Tool input schema
+class HospitalQueryInput(BaseModel):
     query: str
 
 
+# ✅ Subclass BaseTool for compatibility with CrewAI
 class HospitalComparisonTool(BaseTool):
-    name = "hospital_comparison_tool"
-    description = "Compares hospitals based on condition, location, reviews, etc."
-    args_schema: Type[BaseModel] = HospitalComparisonInput
+    name: str = "hospital_comparison_tool"
+    description: str = "Compare hospitals based on condition, location, and patient ratings."
+    args_schema: Type[BaseModel] = HospitalQueryInput
 
     def __init__(self, pandas_agent, **kwargs):
         super().__init__(**kwargs)
-        self.pandas_agent = pandas_agent
+        self._pandas_agent = pandas_agent
 
     def _run(self, query: str) -> str:
-        return self.pandas_agent.run(query)
+        try:
+            result = self._pandas_agent.run(query)
 
-    def _arun(self, query: str) -> str:
+            # ✅ Ensure final answer is clearly returned
+            return f"Final Answer:\n{result}"
+
+        except Exception as e:
+            return f"❌ Error while running hospital comparison: {str(e)}"
+
+
+    def _arun(self, query: str):
         raise NotImplementedError("Async not supported")
 
 
+# ✅ CrewAI-compatible Agent wrapper
 class HospitalComparisonAgent:
     def __init__(self, llm):
-        # Load hospital data
-        df = load_hospital_dataframe()
-        print(f"Loaded hospital data with shape: {df.shape}")
+        self.llm = llm
+        self._agent = self._build_agent()
 
-        # Create the pandas agent
+    def _build_agent(self):
+        df = load_hospital_dataframe()
+        print(f"✅ Loaded hospital data with shape: {df.shape}")
+
         pandas_agent = create_pandas_dataframe_agent(
-            llm=llm,
+            llm=self.llm,
             df=df,
-            verbose=True,
+            verbose=False,
             allow_dangerous_code=True
         )
 
-        # Create a valid CrewAI-compatible tool
-        hospital_comparison_tool = HospitalComparisonTool(pandas_agent=pandas_agent)
+        comparison_tool = HospitalComparisonTool(pandas_agent=pandas_agent)
 
-        # Register CrewAI agent
-        self.agent = Agent(
-            role="Hospital Info Agent",
-            goal="Help users compare hospitals for their health conditions.",
-            backstory="You are a data-driven healthcare assistant with access to hospital data.",
-            tools=[hospital_comparison_tool],
-            llm=llm,
-            verbose=True
+        return Agent(
+            role="Hospital Comparison Agent",
+            goal="Compare hospitals based on user needs like specialty, rating, and location.",
+            backstory="You help users choose the right hospital by analyzing structured hospital data.",
+            tools=[comparison_tool],
+            llm=self.llm,
+            verbose=False
         )
 
     def get_agent(self):
-        return self.agent
-
-
-
-
-
-
-#######
-
-# import pandas as pd
-# from pydantic import BaseModel
-# from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
-# from langchain_core.tools import BaseTool
-# from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate
-# from langchain_openai import ChatOpenAI
-# from textwrap import dedent
-# from src.data.db_loader import load_hospital_dataframe
-# from crewai import Agent
-# from typing import Type
-# from langchain_core.tools import BaseTool
-# from pydantic import BaseModel
-# from langchain.tools import Tool
-
-
-
-# from langchain_experimental.agents.agent_toolkits.pandas.base import create_pandas_dataframe_agent
-# from crewai import Agent
-#from src.data.db_loader import load_hospital_data
-
-#     def __init__(self, llm):
-#         # Load hospital data
-#         df = load_hospital_dataframe()
-#         print(f"Loaded hospital data with shape: {df.shape}")
-
-#         # Create LangChain pandas dataframe agent
-#         self.pandas_agent = create_pandas_dataframe_agent(
-#             llm=llm,
-#             df=df,
-#             verbose=True,
-#             allow_dangerous_code=True  # required!
-#         )
-
-#         # ✅ Define a LangChain Tool compatible with CrewAI
-#         def _run_hospital_comparison(query: str) -> str:
-#             return self.pandas_agent.run(query)
-
-#         self.compare_tool = Tool(
-#         name="HospitalComparisonTool",
-#         description="Compare hospitals based on user query, considering condition, reviews, location, etc.",
-#         func=_run_hospital_comparison
-# )
-
-#         # ✅ Define the CrewAI Agent
-#         self.agent = Agent(
-#         role="Hospital Info Agent",
-#         goal="Help users compare hospitals for their health conditions.",
-#         backstory="You are a data-driven healthcare assistant with access to hospital data.",
-#         tools=[self.compare_tool],  # ✅ This must be a valid BaseTool
-#         llm=llm,
-#         verbose=False
-# )
-
-
-#     def get_agent(self):
-#         return self.agent
-
-
-
-# class HospitalQueryInput(BaseModel):
-#     query: str
-
-# class HospitalComparisonTool(BaseTool):
-#     name: str = "hospital_comparison_tool"
-#     description: str = "Compare hospitals based on user preferences like condition, location, and reviews."
-#     args_schema: Type[BaseModel] = HospitalQueryInput
-
-#     def __init__(self, pandas_agent, **kwargs):
-#         super().__init__(**kwargs)
-#         self._pandas_agent = pandas_agent
-
-#     def _run(self, query: str) -> str:
-#         return self._pandas_agent.invoke(query)
-
-#     def _arun(self, query: str):
-#         raise NotImplementedError("Async not supported")
-
-#     name = "hospital_comparison_tool"
-#     description = "Compare hospitals based on user preferences like condition, location, and reviews."
-#     args_schema = HospitalQueryInput
-
-#     def __init__(self, pandas_agent, **kwargs):
-#         super().__init__(**kwargs)
-#         self._pandas_agent = pandas_agent
-
-#     def _run(self, query: str) -> str:
-#         return self._pandas_agent.invoke(query)
-
-#     def _arun(self, query: str):
-#         raise NotImplementedError("Async not supported")
-
-# class HospitalComparisonAgent:
-#     def __init__(self, llm):
-#         df = load_hospital_dataframe()
-#         print("Loaded hospital data with shape:", df.shape)
-
-#         system_prompt = SystemMessagePromptTemplate.from_template(
-#             dedent("""
-#             You are a highly skilled healthcare assistant with expertise in comparing hospitals.
-#             Your task is to assess various hospitals based on a user's specific conditions, preferences, and needs.
-#             You will evaluate hospitals considering:
-#               - Medical specialties
-#               - Patient reviews and ratings
-#               - Location and accessibility
-#               - Cost and insurance
-#               - Hospital reputation, facilities, and awards
-#             Use the "Hospital Type" column to identify well-equipped facilities.
-#             Use ALL COLUMNS wisely. Provide well-rounded, personalized suggestions.
-#             """)
-#         )
-#         prompt = ChatPromptTemplate.from_messages([system_prompt])
-
-#         pandas_agent = create_pandas_dataframe_agent(
-#             llm=llm,
-#             df=df,
-#             agent_type="openai-functions",
-#             verbose=False,
-#             allow_dangerous_code=True,
-#             handle_parsing_errors=True
-#         )
-
-#         self.agent_tool = HospitalComparisonTool(pandas_agent=pandas_agent)
-    
-#     def get_agent(self):
-#         return self
-
-#     @property
-#     def tools(self):
-#         return [self.agent_tool]
+        return self._agent

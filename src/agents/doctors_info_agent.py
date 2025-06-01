@@ -18,7 +18,7 @@ from src.data.db_loader import get_mysql_uri
 litellm.client_session = httpx.Client(verify=False)
 
 class DoctorSlotAgent:
-    def __init__(self, llm=None, db_path=get_mysql_uri(), verbose=True):
+    def __init__(self, llm=None, db_path=get_mysql_uri(), verbose=False):
         self.llm = llm or ChatOpenAI(model="gpt-4", temperature=0)
         self.verbose = verbose
         self.db = SQLDatabase.from_uri(db_path)

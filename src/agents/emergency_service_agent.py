@@ -1,7 +1,8 @@
 import httpx
 import litellm
 from langchain.prompts import PromptTemplate
-from langchain.agents import create_sql_agent
+from langchain_community.agent_toolkits.sql.base import create_sql_agent
+
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_openai import ChatOpenAI
@@ -14,7 +15,7 @@ from src.data.db_loader import get_mysql_uri
 litellm.client_session = httpx.Client(verify=False)
 
 class EmergencySQLAgent:
-    def __init__(self, llm=None, db_path=get_mysql_uri(), verbose=True):
+    def __init__(self, llm=None, db_path=get_mysql_uri(), verbose=False):
         self.llm = llm or ChatOpenAI(model="gpt-4", temperature=0)
         self.verbose = verbose
         self.db = SQLDatabase.from_uri(db_path)
@@ -77,5 +78,5 @@ def build_emergency_agent(llm=None) -> Agent:
         goal="Analyze emergency services availability data",
         backstory="Expert at analyzing emergency SQL databases for time-sensitive decisions",
         tools=[tool],
-        verbose=True
+        verbose=False
     )

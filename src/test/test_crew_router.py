@@ -3,17 +3,22 @@ from src.agents.crew_router_setup import create_crew_router
 def test_routing_crew():
     test_cases = [
         {
-            "query": "book 1 PM slot for dr lee",
+            "query": "book 3 PM slot for dr lee",
             "expected": "Doctor Availability Checker and Slot Booking"
         },
         {
-            "query": "Which hospitals have emergency services available now in New York?",
+            "query": "Which hospitals have emergency services available now in new york?",
             "expected": "Emergency Information Finder"
         },
         {
             "query": "What diagnostic tests are used to detect diabetes?",
             "expected": "Diagnostic Info Agent"
+        },
+        {
+            "query": "Compare hospitals in Atlanta that specialize in cardiology with high ratings.",
+            "expected": "Hospital Comparison Agent"
         }
+
     ]
 
     for idx, case in enumerate(test_cases, 1):
