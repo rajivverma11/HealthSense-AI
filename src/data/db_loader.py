@@ -59,3 +59,39 @@ def get_mysql_uri() -> str:
         raise ValueError("❌ Missing one or more MySQL DB environment variables.")
 
     return f"mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+
+
+def get_patient_profile(name: str):
+    #
+    connection = mysql.connector.connect(
+        host= LOCAL_DB_CONFIG['host'],
+        user=LOCAL_DB_CONFIG['user'],
+        password=LOCAL_DB_CONFIG['password'],
+        database=LOCAL_DB_CONFIG['database'],
+        port=LOCAL_DB_CONFIG['port']
+    )
+
+    cursor = connection.cursor(dictionary=True)
+
+    query = """
+        SELECT Name, Dateofbirth, Gender, Address, State, Zipcode, Ethnicity, Firstdisease,Seconddisease
+        FROM patient_info
+        WHERE Name LIKE %s 
+        LIMIT 1
+    """
+
+    
+    cursor.execute(query, (f"%{name}%",))  # Adds wildcards
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+   
+  
+    if row:
+        print("✅ One matching record found")
+    else:
+        print("❌ No matching record")
+
+    return row

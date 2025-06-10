@@ -18,3 +18,9 @@ python-dotenv
 pymysql
 sqlalchemy
 crewai-tools
+fastapi
+uvicorn
+streamlit
+pydantic
+requests
+

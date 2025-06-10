@@ -1,25 +1,25 @@
-import pandas as pd
-from .doctor_slot_generator import DoctorSlotGenerator
-
-# Load seed doctor data
-seed_df = pd.read_csv("data/doctors_slots_data.csv")
-
-# Generate slots
-generator = DoctorSlotGenerator(seed_df)
-slots_df = generator.generate_slots(
-    days_ahead=90,
-    work_start_hour=9,
-    work_end_hour=17,
-    interval_minutes=30,
-    exclude_weekends=True
-)
-
-# Save to file
-#slots_df.to_csv("generated_doctor_slots.csv", index=False)
-print(f"✅ Generated doctor slots for working days and count is : {len(slots_df)}")
+from fastapi import FastAPI
+from pydantic import BaseModel
+from src.agents.crew_router_setup import create_crew_router
+#from src.data.db_loader import format_patient_context
+from src.agents.crew_router_setup import format_patient_context
 
 
-if __name__ == "__main__":
-     print("Running main.py...")
-     print(f"✅ Generated doctor slots for working days and count is : {len(slots_df)}")
+app = FastAPI()
 
+class UserQuery(BaseModel):
+    name: str
+    query: str
+
+@app.post("/ask")
+def ask(user_query: UserQuery):
+    try:
+        context = format_patient_context(user_query.name)
+        crew, result = create_crew_router(user_query.query, context)
+        if isinstance(result, dict):
+            final = next(iter(result.values()))
+        else:
+            final = result
+        return {"answer": str(final)}
+    except Exception as e:
+        return {"error": str(e)}

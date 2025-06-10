@@ -2,7 +2,6 @@ import httpx
 import litellm
 from langchain.prompts import PromptTemplate
 from langchain_community.agent_toolkits.sql.base import create_sql_agent
-
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_openai import ChatOpenAI
@@ -16,34 +15,39 @@ litellm.client_session = httpx.Client(verify=False)
 
 class EmergencySQLAgent:
     def __init__(self, llm=None, db_path=get_mysql_uri(), verbose=False):
-        self.llm = llm or ChatOpenAI(model="gpt-4", temperature=0)
+        self.llm = llm
         self.verbose = verbose
         self.db = SQLDatabase.from_uri(db_path)
 
-        self.prompt_template = PromptTemplate.from_template(
-            '''Answer the following questions as best you can. You have access to the following tools:
+        self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
+        self.tools = self.toolkit.get_tools()
+        self.tool_names = [tool.name for tool in self.tools]
 
-{tools}
+        self.prompt_template = PromptTemplate(
+            input_variables=["input", "agent_scratchpad", "tools", "tool_names"],
+            template='''
+    You are a hospital emergency services specialist with access to SQL tools.
 
-Use the following format:
+    Available tools:
+    {tools}
 
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
+    You may ONLY use these tools: [{tool_names}]
 
-Use like operator with lowercase when matching a name. When user is asking to book slots, delete the corresponding row from the table.
-Begin!
+    Respond to questions using this format:
+
+
+    RULES:
+    - Query only from table: `hospital_general_information`
+    - Use column: `emergencyservices` (with `= 1` for hospitals that offer emergency services)
+    - Use 2-letter state codes as-is (e.g., `FL`, `NY`) — do NOT expand to full names
+    - Zip code must be used exactly as stored
+    - If you find matches, name the hospitals and cities
+    - If no match, clearly say that no emergency hospital was found
 
 Question: {input}
-Thought:{agent_scratchpad}'''
+{agent_scratchpad}
+'''
         )
-
-        self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
 
         self.agent = create_sql_agent(
             llm=self.llm,
@@ -59,7 +63,7 @@ Thought:{agent_scratchpad}'''
 
 class EmergencyQueryTool(BaseTool):
     name: str = "sql_query_tool"
-    description: str = "Run SQL queries and analyze emergency database"
+    description: str = "Query hospital_general_information data like EmergencyServices"
     agent: Any = Field(...)
 
     def _run(self, query: str) -> str:
@@ -74,9 +78,10 @@ def build_emergency_agent(llm=None) -> Agent:
     tool = EmergencyQueryTool(agent=agent_instance)
 
     return Agent(
-        role="Emergency Information Finder",
-        goal="Analyze emergency services availability data",
-        backstory="Expert at analyzing emergency SQL databases for time-sensitive decisions",
+       role='Emergency Information Finder',
+        goal='Analyze emergency services availability data',
+        backstory='Expert at analyzing complex datasets using SQL',
         tools=[tool],
-        verbose=False
+        verbose=True,
+        max_iter=3
     )

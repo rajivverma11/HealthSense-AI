@@ -3,19 +3,8 @@ import numpy as np
 import mysql.connector
 from mysql.connector import Error
 from src.utils.cleaners import clean_emergency_services_column
+from src.data.constants import LOCAL_DB_CONFIG
 
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-LOCAL_DB_CONFIG = {
-    'host': os.getenv('LOCAL_DB_HOST'),
-    'user': os.getenv('LOCAL_DB_USER'),
-    'password': os.getenv('LOCAL_DB_PASSWORD'),
-    'database': os.getenv('LOCAL_DB_NAME'),
-    'port': int(os.getenv('LOCAL_DB_PORT'))  # Convert from string to int
-}
 
 def transform_dataframe(df):
      rename_map = {
@@ -41,34 +30,7 @@ def transform_dataframe(df):
     }
      df.rename(columns=rename_map, inplace=True)
      df = df[list(rename_map.values())]
-     #df = clean_emergency_services_column(df)
-     #print("Columns in df:", df.columns.tolist())
-        
-
-
-#      comparison_columns = [
-#         "MortalityNationalComparison",
-#         "SafetyCareNationalComparison",
-#         "ReadmissionNationalComparison",
-#         "PatientExperienceNationalComparison",
-#         "NationalComparisonEffectiveness",
-#         "CareTimelinesNationalComparison",
-#         "EfficientMedicalImagingNationalComparison"
-#     ]
-     
-#      def map_comparison(val):
-#           val1 = str(val).strip().lower()
-#           if 'above' in val1:
-#                return 3
-#           elif 'same' in val1:
-#                return 2
-#           elif 'below' in val1:
-#                return 1
-#           else:
-#                return 0
-     
-#      for col in comparison_columns:
-#           df.loc[:, col]  = df[col].apply(map_comparison)
+  
      
      return df
          

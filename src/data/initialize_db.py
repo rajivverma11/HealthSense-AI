@@ -1,12 +1,12 @@
 import mysql.connector
 from mysql.connector import Error
 
-from src.data.constants import LOCAL_DB_CONFIG
+from src.data.constants import DB_CONFIG
 
 
 def create_tables():
     try:
-        conn = mysql.connector.connect(**LOCAL_DB_CONFIG)
+        conn = mysql.connector.connect(**DB_CONFIG)
         if conn.is_connected():
             cursor = conn.cursor()
  

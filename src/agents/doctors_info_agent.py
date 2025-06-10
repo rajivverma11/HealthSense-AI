@@ -26,28 +26,31 @@ class DoctorSlotAgent:
         self.prompt_template = PromptTemplate.from_template(
             '''Answer the following questions as best you can. You have access to the following tools:
 
-{tools}
+        {tools}
 
-Use the following format:
+        Use the following format:
 
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
+        Question: the input question you must answer  
+        Thought: you should always think about what to do  
+        Action: the action to take, should be one of [{tool_names}]  
+        Action Input: the input to the action  
+        Observation: the result of the action  
+        ... (this Thought/Action/Action Input/Observation can repeat N times)  
+        Thought: I now know the final answer  
+        Final Answer: the final answer to the original input question  
 
-Use like operator with lowercase when matching a name.
-When a user is asking to book slots for any dr, update is_available the corresponding row from the table.
-Begin!
+        Match doctor names and specialties using LIKE and lowercase logic. Do not try complex reasoning. Just retrieve and book slots as clearly instructed.  
+        If a user provides a specific time (e.g., '3 PM'), try to match it.  
+        Update `is_available` to 0 when booking a slot.  
+        If no available doctor is found or the request is unclear, reply immediately without retrying endlessly.  
+        Begin!
 
-Question: {input}
-Thought:{agent_scratchpad}'''
+        Question: {input}
+        Thought:{agent_scratchpad}'''
         )
 
         self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
+
         self.langchain_agent = create_sql_agent(
             llm=self.llm,
             toolkit=self.toolkit,
@@ -58,8 +61,10 @@ Thought:{agent_scratchpad}'''
         )
 
     def run_query(self, query: str) -> str:
-        return self.langchain_agent.invoke(query)
-
+        try:
+            return self.langchain_agent.invoke(query)
+        except Exception as e:
+            return f"⚠️ Unable to process your request with gpt-3.5-turbo: {str(e)}"
 
 class SlotsQueryTool(BaseTool):
     name: str = "sql_query_tool"
@@ -72,15 +77,21 @@ class SlotsQueryTool(BaseTool):
     def _arun(self, query: str) -> str:
         raise NotImplementedError("Async not supported")
 
-
 def build_crewai_agent(llm=None) -> Agent:
     agent_impl = DoctorSlotAgent(llm=llm)
     tool = SlotsQueryTool(agent=agent_impl)
 
     return Agent(
-        role="Doctor Availability Checker and Slot Booking",
-        goal="Analyze doctor availability and book slots if asked",
-        backstory="Expert at querying and modifying SQL slot data for doctors.",
+        role="Doctor Slot Manager",
+        goal=(
+            "Quickly find and book a slot with a doctor who specializes in the patient's condition. "
+            "If no match is found, respond clearly and exit without retrying."
+        ),
+        backstory=(
+            "You are a scheduling expert with access to a SQL database of doctors and their availability. "
+            "You are trained to interpret vague queries, match them to known medical specialties, and handle slot booking efficiently. "
+            "You prioritize speed and clarity. You avoid infinite retries. You can handle both named doctors and generic requests using specialties."
+        ),
         tools=[tool],
         verbose=False
     )
