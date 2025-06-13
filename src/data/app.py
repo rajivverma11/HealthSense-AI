@@ -9,7 +9,9 @@ query = st.text_area("What would you like to know?")
 if st.button("Submit"):
     if name and query:
         with st.spinner("Thinking..."):
-            response = requests.post("http://localhost:8000/ask", json={"name": name, "query": query})
+            #response = requests.post("http://localhost:8000/ask", json={"name": name, "query": query})
+            response = requests.post("http://fastapi:8000/ask", json={"name": name, "query": query})
+
             result = response.json()
             st.markdown("### Response:")
             st.write(result.get("answer", result.get("error", "Something went wrong.")))

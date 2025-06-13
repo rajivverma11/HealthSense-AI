@@ -4,14 +4,15 @@ from langchain_openai import ChatOpenAI
 import os
 import httpx
 import litellm
-from src.data.constants import DB_CONFIG
+from src.data.constants import DB_CONFIG,LOCAL_DB_CONFIG
 
 # Optional: Turn off SSL verification for development (not recommended for production)
 litellm.client_session = httpx.Client(verify=False)
 
 # Load your OpenAI API key from environment or hardcode for testing (prefer env)
-openai_api_key = DB_CONFIG['OPENAI_API_KEY']  # fallback for dev
-#print(f"Open API Key is : {openai_api_key}")
+openai_api_key = os.environ.get('OPENAI_API_KEY')
+#openai_api_key = LOCAL_DB_CONFIG['OPENAI_API_KEY']  # fallback for dev
+print(f"Open API Key is : {openai_api_key}")
        
 
 

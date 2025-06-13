@@ -14,8 +14,8 @@ class UserQuery(BaseModel):
 @app.post("/ask")
 def ask(user_query: UserQuery):
     try:
-        context = format_patient_context(user_query.name)
-        crew, result = create_crew_router(user_query.query, context)
+        #context = format_patient_context(user_query.name)
+        crew, result = create_crew_router(user_query.query, user_query.name)
         if isinstance(result, dict):
             final = next(iter(result.values()))
         else:

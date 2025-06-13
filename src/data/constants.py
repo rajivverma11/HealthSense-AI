@@ -10,6 +10,8 @@ DB_CONFIG ={
     'password': os.getenv('DB_PASSWORD'),
     'database': os.getenv('DB_NAME'),
     'port': int(os.getenv('DB_PORT', 3306)),
+    'OPENAI_API_KEY': os.getenv('OPENAI_API_KEY'),
+    'LLM_MODEL_NAME': os.getenv('LLM_MODEL_NAME')
    
 }
 

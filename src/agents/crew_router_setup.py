@@ -45,6 +45,7 @@ def GetAge(dob_str):
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 def format_patient_context(name: str) -> str:
+    print(f"✅ Patient name: {name}") 
     patient = get_patient_profile(name)
     if not patient:
         return "User information is not available."
@@ -63,9 +64,9 @@ def format_patient_context(name: str) -> str:
 def create_crew_router(query: str, name: str):
     # ⏪ Load prior summary memory for this user
     initial_summary = load_summary(name)
-
+    print(f"⏪ query: {query} , name :{name}") 
     summary_memory = ConversationSummaryMemory(
-        llm=ChatOpenAI(temperature=0, model="gpt-4"),
+        llm=llm,
         memory_key="chat_history",
         return_messages=True,
         input_key="input"
@@ -82,7 +83,7 @@ def create_crew_router(query: str, name: str):
     )
 
     memory_context = format_patient_context(name)
-    print(f"memory_context: {memory_context}")
+    print(f"memory_context: {memory_context} and name is : {name}")
 
     routing_task = Task(
         description=dedent(f"""
@@ -144,6 +145,7 @@ def create_crew_router(query: str, name: str):
         summary_text = "\n".join(
             [f"{msg.type.upper()}: {msg.content}" for msg in chat_history if msg.content.strip()]
         )
+        print(f"name is : {name} and summary_text is : {summary_text}")
         save_summary(name, summary_text)
 
     return crew, result

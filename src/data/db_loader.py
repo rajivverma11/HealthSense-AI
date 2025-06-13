@@ -1,17 +1,32 @@
 import mysql.connector
 import pandas as pd
 import os
-from src.data.constants import LOCAL_DB_CONFIG
+from src.data.constants import LOCAL_DB_CONFIG,DB_CONFIG
 
 
-def load_hospital_dataframe() -> pd.DataFrame:
-    connection = mysql.connector.connect(
+def get_cloud_connection():
+    return mysql.connector.connect(
+        host= DB_CONFIG['host'],
+        user=DB_CONFIG['user'],
+        password=DB_CONFIG['password'],
+        database=DB_CONFIG['database'],
+        port=DB_CONFIG['port']
+
+    )
+
+def get_local_connection():
+    return mysql.connector.connect(
         host= LOCAL_DB_CONFIG['host'],
         user=LOCAL_DB_CONFIG['user'],
         password=LOCAL_DB_CONFIG['password'],
         database=LOCAL_DB_CONFIG['database'],
         port=LOCAL_DB_CONFIG['port']
+
     )
+
+
+def load_hospital_dataframe() -> pd.DataFrame:
+    connection = get_cloud_connection()
 
     query = "SELECT * FROM hospital_general_information"
     df = pd.read_sql(query, con=connection)
@@ -19,13 +34,7 @@ def load_hospital_dataframe() -> pd.DataFrame:
     return df
 
 def load_hospital_info_test_dataframe() -> pd.DataFrame:
-    connection = mysql.connector.connect(
-        host= LOCAL_DB_CONFIG['host'],
-        user=LOCAL_DB_CONFIG['user'],
-        password=LOCAL_DB_CONFIG['password'],
-        database=LOCAL_DB_CONFIG['database'],
-        port=LOCAL_DB_CONFIG['port']
-    )
+    connection = get_cloud_connection()
 
     # Write the SQL query with an INNER JOIN on provider_id
     query = """
@@ -49,11 +58,17 @@ def load_hospital_info_test_dataframe() -> pd.DataFrame:
 
 def get_mysql_uri() -> str:
     """Builds SQLAlchemy-style MySQL URI from .env"""
-    user = LOCAL_DB_CONFIG['user']
-    password = LOCAL_DB_CONFIG['password']
-    host = LOCAL_DB_CONFIG['host']
-    port = LOCAL_DB_CONFIG['port']
-    db = LOCAL_DB_CONFIG['database']
+    # user = LOCAL_DB_CONFIG['user']
+    # password = LOCAL_DB_CONFIG['password']
+    # host = LOCAL_DB_CONFIG['host']
+    # port = LOCAL_DB_CONFIG['port']
+    # db = LOCAL_DB_CONFIG['database']
+
+    user = DB_CONFIG['user']
+    password = DB_CONFIG['password']
+    host = DB_CONFIG['host']
+    port = DB_CONFIG['port']
+    db = DB_CONFIG['database']
 
     if not all([user, password, host, port, db]):
         raise ValueError("❌ Missing one or more MySQL DB environment variables.")
@@ -63,13 +78,7 @@ def get_mysql_uri() -> str:
 
 def get_patient_profile(name: str):
     #
-    connection = mysql.connector.connect(
-        host= LOCAL_DB_CONFIG['host'],
-        user=LOCAL_DB_CONFIG['user'],
-        password=LOCAL_DB_CONFIG['password'],
-        database=LOCAL_DB_CONFIG['database'],
-        port=LOCAL_DB_CONFIG['port']
-    )
+    connection = get_cloud_connection()
 
     cursor = connection.cursor(dictionary=True)
 

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build: .
+    container_name: fastapi-service
+    ports:
+      - "80:8000"
+    env_file:
+      - .env
+    command: uvicorn src.data.main:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
+
+  streamlit:
+    build: .
+    container_name: streamlit-service
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    working_dir: /app
+    command: streamlit run src/data/app.py --server.port=8501 --server.address=0.0.0.0
+    volumes:
+      - ./src/data/app.py:/app/src/data/app.py
+    restart: unless-stopped
