@@ -3,6 +3,11 @@ import numpy as np
 import mysql.connector
 from mysql.connector import Error
 from src.data.constants import LOCAL_DB_CONFIG
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 
 
@@ -35,7 +40,11 @@ def insert_data(df):
 
 
     try:
+          print(f"host is :{LOCAL_DB_CONFIG['host']}")
+          print("Loaded DB host from .env:", os.getenv("LOCAL_DB_HOST"))
           conn = mysql.connector.connect(**LOCAL_DB_CONFIG)
+          print(f"host is :{LOCAL_DB_CONFIG['host']}")
+          
           cursor = conn.cursor()
           cursor.execute("DELETE FROM patient_info") 
           insert_sql = """
@@ -64,8 +73,9 @@ def insert_data(df):
 if __name__ == "__main__":
      print("Running initialize_db.py...")
      file_path = 'data/Synthetic_Patient_Data.csv'
-     df = pd.read_csv(file_path)
+     df = pd.read_csv(file_path, delimiter='\t')
      print("Columns in CSV:", df.columns.tolist())
 
      df_clean = transform_dataframe(df)
+     print("Columns in df_clean:",df_clean.columns.tolist())
      insert_data(df_clean)

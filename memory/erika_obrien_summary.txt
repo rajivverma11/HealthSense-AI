@@ -1,0 +1,1 @@
+SYSTEM: The human asks the AI to compare hospitals in a specific zip code that specialize in a particular disease with high ratings. The AI successfully delegates the request to the Hospital Finder and Comparator for detailed information.

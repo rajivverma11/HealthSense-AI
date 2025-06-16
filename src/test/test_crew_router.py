@@ -17,13 +17,13 @@ def test_routing_crew():
         {
             "query": "What diagnostic tests are used to detect disease?",
             "expected": "Diagnostic Info Agent",
-            "name": "Gregory Caldwell"
+            "name": "Matthew Davis MD"
         },
-        # {
-        #     "query": "Compare hospitals in patient zipcode that specialize in his disease with high ratings.",
-        #     "expected": "Hospital Comparison Agent",
-        #    "name": "Gregory Caldwell"
-        # }
+        {
+            "query": "Compare hospitals in patient zipcode that specialize in his disease with high ratings.",
+            "expected": "Hospital Comparison Agent",
+           "name": "Matthew Davis MD"
+        }
     ]
 
     for idx, case in enumerate(test_cases, 1):
