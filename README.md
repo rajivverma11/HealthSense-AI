@@ -1,50 +1,27 @@
 
-HealthSense AI
+**HealthSense AI**
 
 
-AI-Driven Multi-Agent Healthcare System
-
-
-
-Introduction & Motivation
-
+**AI-Driven Multi-Agent Healthcare System**
 
 The integration of Generative AI (GenAI) and Large Language Models (LLMs) has significantly transformed the healthcare sector by enabling advanced natural language processing, improving access to medical information, and streamlining patient interactions. AI-powered solutions can assist in diagnosing conditions, providing health recommendations, and offering 24/7 support to patients.
 
 Despite the abundance of medical knowledge, accessing personalized and reliable health information remains a challenge. Many existing healthcare systems provide generic responses and lack contextual awareness. HealthSense AI is designed to bridge this gap by leveraging LLMs and the LangChain framework to offer intelligent, context-aware health information assistance.
 
-
-Business Problem Overview and Potential Impact
-
+**Business Problem Overview and Potential Impact**
 
 Challenges in Healthcare Information Systems
 Limited Personalization – Most healthcare information systems provide one-size-fits-all responses that lack user-specific relevance.
 Lack of Context Awareness – Many AI assistants struggle to maintain conversation history and context over multiple interactions.
 Fragmented Information Sources – Medical knowledge is scattered across multiple databases, making it difficult to consolidate accurate information efficiently.
 
+**Key Problem Statement**
 
-Who Can Benefit from HealthSense AI?
-
-
-
-
-
-Potential Impact
-
-
-Startups such as Babylon Health, Ada Health, and Buoy Health are already leveraging AI to enhance healthcare delivery. HealthSense AI aims to build upon this trend by providing context-aware, real-time, and interactive healthcare assistance, improving patient outcomes and reducing the burden on healthcare professionals.
-
-Key Problem Statement
-
-
-“Develop an intelligent healthcare platform that streamlines medical service discovery and booking by analyzing hospital data, reviews, and healthcare metrics. 
-
+Develop an intelligent healthcare platform that streamlines medical service discovery and booking by analyzing hospital data, reviews, and healthcare metrics. 
 The system will extract and compare key parameters to help users make informed healthcare decisions.
+The solution will feature a comprehensive comparison engine for hospitals and diagnostic centers, an automated slot booking system, and detailed information about medical tests and procedures. The platform will incorporate a user-friendly chat interface to hospital comparisons, explore healthcare metrics, and facilitate seamless appointment scheduling.
 
-The solution will feature a comprehensive comparison engine for hospitals and diagnostic centers, an automated slot booking system, and detailed information about medical tests and procedures. The platform will incorporate a user-friendly chat interface to hospital comparisons, explore healthcare metrics, and facilitate seamless appointment scheduling.”
-
-System Features
-
+**System Features**
 
 Here's a structured breakdown of system features for HealthSense:
 
@@ -64,16 +41,12 @@ Interactive UI & Dashboards:
 Develop user-friendly interface for healthcare service exploration
 
 
-
-
-Dataset Overview
+**Dataset Overview**
 
 
 To build an effective and reliable AI-driven healthcare assistant, HealthSense AI will use structured datasets stored in MySQL.
 
-
 Hospital General Information Dataset
-
 Contains hospital names, locations, specialties, capacity, and contact details.
 Used for hospital comparisons and providing relevant hospital recommendations.
 Source: Public healthcare directories and government datasets.
